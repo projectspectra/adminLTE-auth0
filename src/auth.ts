@@ -5,11 +5,12 @@ import session from "express-session";
 import dotenv from "dotenv";
 import jwkToPem from "jwk-to-pem";
 import jwt from "jsonwebtoken";
+import { SessionUser } from "./types/SessionUser";
 
 dotenv.config();
 const verifyFn: VerifyFunction =
   (accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) => {
-    console.log(`Access Token: ${accessToken}\n\nRefresh Token: ${refreshToken}\n\nProfile: ${JSON.stringify(profile)}`);
+    // console.log(`Access Token: ${accessToken}\n\nRefresh Token: ${refreshToken}\n\nProfile: ${JSON.stringify(profile)}`);
 
     try {
       // Verify Token
@@ -29,10 +30,10 @@ const verifyFn: VerifyFunction =
         'Content-Type': 'application/json'
       }
     })
+
     .then(response => response.json())
     .then(data => {
-      console.log(`Logged In User Data: ${JSON.stringify(data)}`);
-      done(null, data);
+      done(null, new SessionUser(data));
     })
     .catch(error => {
       console.error('Error fetching User info:', error);
@@ -53,17 +54,20 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user)
+  done(null, JSON.stringify(user));
 });
 passport.deserializeUser((obj: any, done) => {
-  done(null, obj)
+  done(null, new SessionUser(JSON.parse(obj)));
 });
 
 export function authConfig(app: any) {
+  const Twenty4Hours = 24 * 60 * 60 * 1000; //ms
   app.use(
     session({
       secret: process.env.SESSION_SECRET!,
-      cookie: {},
+      cookie: {
+        maxAge: Twenty4Hours
+      },
       resave: false,
       saveUninitialized: true
     })
@@ -72,7 +76,9 @@ export function authConfig(app: any) {
   app.use(passport.session());
 
   // Route to initiate login
-  app.get('/login', passport.authenticate('oauth2'));
+  app.get('/login', passport.authenticate('oauth2', {
+
+  }));
 
   // Callback route after Cognito authentication
   app.get('/callback', passport.authenticate('oauth2', {
@@ -84,7 +90,7 @@ export function authConfig(app: any) {
   app.get('/logout', (req: Request, res: Response) => {
     req.logout(() => {
       req.session.destroy(() => {
-        res.redirect('/');
+        res.redirect('/login');
       });
     });
   });

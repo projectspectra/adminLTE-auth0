@@ -5,6 +5,8 @@ import { authConfig } from "./auth";
 import router from "./routes";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import { SessionUser } from "./types/SessionUser";
+import expressLayouts from 'express-ejs-layouts';
 
 dotenv.config();
 
@@ -17,10 +19,21 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 app.use(cookieParser());
 authConfig(app);
 
+app.use(expressLayouts);
+app.set('layout', '../views/structure/layout');
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../views"));
 
 app.use(express.static(path.join(__dirname, "../public")));
+app.use((req, res, next) => {
+    // Set Ananymous User:
+    if(!(req.user instanceof SessionUser))
+        req.user = new SessionUser(req.user);
+
+    res.locals.user = req.user;
+    res.locals.env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+    next();
+});
 app.use("/", router);
 
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));
