@@ -1,10 +1,10 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { SessionUser } from "./types/SessionUser";
 import logger from "./utils/logger";
 
 const router = Router();
 
-function isAuthenticated(req: Request, res: Response, next: Function) {
+function isAuthenticated(req: Request, res: Response, next: NextFunction) {
   logger.log(`Checking if user is authenticated ${req.isAuthenticated()}`, req.sessionID);
   
   if (req.isAuthenticated()) {

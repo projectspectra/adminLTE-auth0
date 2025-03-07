@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Express, Request, Response } from "express";
 import passport from "passport";
 import { Strategy as OAuth2Strategy, VerifyCallback, VerifyFunction } from "passport-oauth2";
 import session from "express-session";
@@ -10,7 +10,7 @@ import logger from "./utils/logger";
 
 dotenv.config();
 const verifyFn: VerifyFunction =
-  (accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) => {
+  (accessToken: string, refreshToken: string, profile: unknown, done: VerifyCallback) => {
     try {
       // Verify Token
       const jwk = JSON.parse(process.env.COGNITO_JWK!);
@@ -56,11 +56,11 @@ passport.use(
 passport.serializeUser((user, done) => {
   done(null, JSON.stringify(user));
 });
-passport.deserializeUser((obj: any, done) => {
+passport.deserializeUser((obj: string, done) => {
   done(null, new SessionUser(JSON.parse(obj)));
 });
 
-export function authConfig(app: any) {
+export function authConfig(app: Express) {
   const Twenty4Hours = 24 * 60 * 60 * 1000; //ms
   app.use(
     session({

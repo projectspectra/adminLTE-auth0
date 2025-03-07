@@ -1,5 +1,5 @@
 export class SessionUser {
-    constructor(data?: any) {
+    constructor(data?: SessionUser) {
         if(!data) return;
         if(data.name) this.name = data.name;
         if(data.email) this.email = data.email;
