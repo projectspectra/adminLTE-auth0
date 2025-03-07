@@ -1,18 +1,18 @@
-const log = (message: string | Error | object, level: 'info' | 'warn' | 'table' | 'error', sessionId?: string) => {
+const log = (message: string | Error | object | unknown, level: 'info' | 'warn' | 'table' | 'error', userGuid?: string) => {
     if (message instanceof Error) {
         message = message.message + '\n' + message.stack;
     }
-    if (typeof message === 'object') {
-        console[level](`[${level.toUpperCase()}][${sessionId || 'SYSTEM'}]`);
-        console[level](message);
+    if (typeof message !== 'string') {
+        console[level](`[${level.toUpperCase()}][${userGuid || 'SYSTEM'}]`, message);
     } else {
-        console[level](`[${level.toUpperCase()}][${sessionId || 'SYSTEM'}] ` + message);
+        console[level](`[${level.toUpperCase()}][${userGuid || 'SYSTEM'}] ${message}`);
     }
 }
+
 export default {
-    log: (message: unknown, sessionId?: string) => log(JSON.stringify(message, null, 2), 'info', sessionId),
-    info: (message: unknown, sessionId?: string) => log(JSON.stringify(message, null, 2), 'info', sessionId),
-    error: (message: unknown, sessionId?: string) => log(JSON.stringify(message, null, 2), 'error', sessionId),
-    warn: (message: unknown, sessionId?: string) => log(JSON.stringify(message, null, 2), 'warn', sessionId),
-    debug: (message: unknown, sessionId?: string) => log(JSON.stringify(message, null, 2), 'table', sessionId),
+    log: (message: string | Error | object, userGuid?: string) => log(message, 'info', userGuid),
+    info: (message: string | Error | object, userGuid?: string) => log(message, 'info', userGuid),
+    error: (message: string | Error | object | unknown, userGuid?: string) => log(message, 'error', userGuid),
+    warn: (message: string | Error | object, userGuid?: string) => log(message, 'warn', userGuid),
+    debug: (message: string | Error | object, userGuid?: string) => log(message, 'table', userGuid),
 }

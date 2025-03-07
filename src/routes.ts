@@ -1,21 +1,20 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { SessionUser } from "./types/SessionUser";
 import logger from "./utils/logger";
 
 const router = Router();
 
 function isAuthenticated(req: Request, res: Response, next: NextFunction) {
-  logger.log(`Checking if user is authenticated ${req.isAuthenticated()}`, req.sessionID);
+  logger.log(`Checking if user is authenticated ${req.isAuthenticated()}`, req.user?.sub);
   
   if (req.isAuthenticated()) {
-    if ((req.user as SessionUser).name === 'Anonymous') {
+    if (req.user.email === 'an@ny.mous') {
       res.redirect("/logout");
     } else {
       next();
     }
   }
   else {
-    logger.error('User not authenticated', req.sessionID);
+    logger.error('User not authenticated', req.user?.sub);
     res.redirect("/login");
   }
 }

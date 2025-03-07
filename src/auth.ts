@@ -1,12 +1,13 @@
 import { Express, Request, Response } from "express";
 import passport from "passport";
 import { Strategy as OAuth2Strategy, VerifyCallback, VerifyFunction } from "passport-oauth2";
-import session from "express-session";
+import session, { SessionOptions } from "express-session";
 import dotenv from "dotenv";
 import jwkToPem from "jwk-to-pem";
 import jwt from "jsonwebtoken";
 import { SessionUser } from "./types/SessionUser";
 import logger from "./utils/logger";
+import FileStore from "session-file-store";
 
 dotenv.config();
 const verifyFn: VerifyFunction =
@@ -16,7 +17,7 @@ const verifyFn: VerifyFunction =
       const jwk = JSON.parse(process.env.COGNITO_JWK!);
       const pem = jwkToPem(jwk)
       jwt.verify(accessToken, pem)
-    } catch (error) {
+    } catch (error :unknown) {
       logger.error('Error verifying token');
       logger.error(error);
       return done(error);
@@ -36,7 +37,8 @@ const verifyFn: VerifyFunction =
       done(null, new SessionUser(data));
     })
     .catch(error => {
-      logger.error('Error fetching User info:', error);
+      logger.error('Error fetching User info: ' + error.message);
+      logger.error(error);
       done(error);
     });
   };
@@ -54,24 +56,35 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, JSON.stringify(user));
+  done(null, user);
 });
-passport.deserializeUser((obj: string, done) => {
-  done(null, new SessionUser(JSON.parse(obj)));
+passport.deserializeUser((obj: SessionUser, done) => {
+  done(null, obj);
 });
 
 export function authConfig(app: Express) {
   const Twenty4Hours = 24 * 60 * 60 * 1000; //ms
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET!,
-      cookie: {
-        maxAge: Twenty4Hours
-      },
-      resave: false,
-      saveUninitialized: true
-    })
-  );
+  const sessionOptions: SessionOptions = {
+    secret: process.env.SESSION_SECRET!,
+    cookie: {
+      secure: false,
+      maxAge: Twenty4Hours
+    },
+    resave: false,
+    saveUninitialized: true
+  };
+
+  if (process.env.NODE_ENV !== 'production') {
+    const FileStoreSession = FileStore(session);
+    sessionOptions.store = new FileStoreSession({
+      logFn: () => {},
+      path: './sessions'
+    });
+  } else {
+    sessionOptions.cookie!.secure = true
+  }
+  
+  app.use(session(sessionOptions));
   app.use(passport.initialize());
   app.use(passport.session());
 

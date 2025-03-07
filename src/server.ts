@@ -1,18 +1,17 @@
-import express from "express";
+import express, { Request } from "express";
 import dotenv from "dotenv";
 import path from "path";
 import { authConfig } from "./auth";
 import router from "./routes";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import { SessionUser } from "./types/SessionUser";
 import expressLayouts from 'express-ejs-layouts';
 import logger from "./utils/logger";
+import "./types/express";
 
 dotenv.config();
 
 const app = express();
-app.use(morgan('dev'));
 
 // Body parsing middleware
 app.use(express.json());                         // for parsing application/json
@@ -27,14 +26,19 @@ app.set("views", path.join(__dirname, "../views"));
 
 app.use(express.static(path.join(__dirname, "../public")));
 app.use((req, res, next) => {
-    // Set Ananymous User:
-    if(!(req.user instanceof SessionUser))
-        req.user = new SessionUser(req.user as SessionUser);
+    if (req.user) {
+        res.locals.userGuid = req.user.sub;
+    }
 
     res.locals.user = req.user;
-    res.locals.env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+    res.locals.env = process.env.NODE_ENV;
     next();
 });
+
+morgan.token('userGuid', function (req: Request) { return req.user?.sub || '-' });
+app.use(morgan(':method :url :status :userGuid :response-time ms - :res[content-length]'));
 app.use("/", router);
+
+
 
 app.listen(3000, () => logger.log("Server running on http://localhost:3000"));
