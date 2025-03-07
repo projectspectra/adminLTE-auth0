@@ -29,7 +29,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.use((req, res, next) => {
     // Set Ananymous User:
     if(!(req.user instanceof SessionUser))
-        req.user = new SessionUser(req.user);
+        req.user = new SessionUser(req.user as SessionUser);
 
     res.locals.user = req.user;
     res.locals.env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
