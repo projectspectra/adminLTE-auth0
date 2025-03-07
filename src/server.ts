@@ -1,5 +1,7 @@
-import express, { Request } from "express";
 import dotenv from "dotenv";
+dotenv.config(); // push .env variables into process.env
+
+import express, { Request } from "express";
 import path from "path";
 import { authConfig } from "./auth";
 import router from "./routes";
@@ -8,8 +10,6 @@ import cookieParser from "cookie-parser";
 import expressLayouts from 'express-ejs-layouts';
 import logger from "./utils/logger";
 import "./types/express";
-
-dotenv.config();
 
 const app = express();
 
