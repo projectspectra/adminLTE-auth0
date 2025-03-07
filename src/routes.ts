@@ -34,6 +34,7 @@ const renderPage = (router: Router, pageName: string, alias?: string) => {
 renderPage(router, "dashboard");
 renderPage(router, "dashboard", '/');
 renderPage(router, "dashboard", '');
-renderPage(router, 'dashboard', 'calibration');
+
+renderPage(router, "calibrations");
 
 export default router;
