@@ -16,4 +16,5 @@ export class SessionUser {
     public phone_number: string = '12345678901';
     public phone_number_verified: boolean = false;
     public username: string = '12345678-1234-1234-1234-123456789012';
+    public groups: string[] = [];
 }

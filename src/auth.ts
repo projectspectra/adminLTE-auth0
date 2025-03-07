@@ -3,24 +3,33 @@ import passport from "passport";
 import { Strategy as OAuth2Strategy, VerifyCallback, VerifyFunction } from "passport-oauth2";
 import session, { SessionOptions } from "express-session";
 import jwkToPem from "jwk-to-pem";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { SessionUser } from "./types/SessionUser";
 import logger from "./utils/logger";
 import FileStore from "session-file-store";
 
 const verifyFn: VerifyFunction =
   (accessToken: string, refreshToken: string, profile: unknown, done: VerifyCallback) => {
+    // logger.log(`Access Token: ${accessToken}\n\nRefresh Token: ${refreshToken}\n\nProfile: ${JSON.stringify(profile)}`);
+    let decodedToken :JwtPayload = {
+      'cognito:groups': []
+    };
+
     try {
       // Verify Token
       const jwk = JSON.parse(process.env.COGNITO_JWK!);
       const pem = jwkToPem(jwk)
       jwt.verify(accessToken, pem)
+      const tokenObject = jwt.decode(accessToken);
+      if (typeof tokenObject === 'object' && tokenObject !== null) {
+        decodedToken = tokenObject;
+      }
     } catch (error :unknown) {
       logger.error('Error verifying token');
       logger.error(error);
       return done(error);
     }
-    
+
     // Get User Info
     fetch(`https://${process.env.COGNITO_DOMAIN!}/oauth2/userInfo`, {
       method: 'GET',
@@ -29,16 +38,18 @@ const verifyFn: VerifyFunction =
         'Content-Type': 'application/json'
       }
     })
-
     .then(response => response.json())
     .then(data => {
-      done(null, new SessionUser(data));
+      let sessionUser = new SessionUser(data);
+      sessionUser.groups = decodedToken['cognito:groups'];
+
+      done(null, sessionUser);
     })
     .catch(error => {
       logger.error('Error fetching User info: ' + error.message);
       logger.error(error);
       done(error);
-    });
+    })
   };
 
 passport.use(
@@ -87,9 +98,7 @@ export function authConfig(app: Express) {
   app.use(passport.session());
 
   // Route to initiate login
-  app.get('/login', passport.authenticate('oauth2', {
-
-  }));
+  app.get('/login', passport.authenticate('oauth2'));
 
   // Callback route after Cognito authentication
   app.get('/callback', passport.authenticate('oauth2', {
