@@ -1,10 +1,11 @@
 import { Router, Request, Response } from "express";
 import { SessionUser } from "./types/SessionUser";
+import logger from "./utils/logger";
 
 const router = Router();
 
 function isAuthenticated(req: Request, res: Response, next: Function) {
-  console.log('Checking if user is authenticated', req.isAuthenticated());
+  logger.log(`Checking if user is authenticated ${req.isAuthenticated()}`, req.sessionID);
   
   if (req.isAuthenticated()) {
     if ((req.user as SessionUser).name === 'Anonymous') {
@@ -14,7 +15,7 @@ function isAuthenticated(req: Request, res: Response, next: Function) {
     }
   }
   else {
-    console.error('User not authenticated');
+    logger.error('User not authenticated', req.sessionID);
     res.redirect("/login");
   }
 }

@@ -6,19 +6,19 @@ import dotenv from "dotenv";
 import jwkToPem from "jwk-to-pem";
 import jwt from "jsonwebtoken";
 import { SessionUser } from "./types/SessionUser";
+import logger from "./utils/logger";
 
 dotenv.config();
 const verifyFn: VerifyFunction =
   (accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) => {
-    // console.log(`Access Token: ${accessToken}\n\nRefresh Token: ${refreshToken}\n\nProfile: ${JSON.stringify(profile)}`);
-
     try {
       // Verify Token
       const jwk = JSON.parse(process.env.COGNITO_JWK!);
       const pem = jwkToPem(jwk)
       jwt.verify(accessToken, pem)
     } catch (error) {
-      console.error('Error verifying token:', error);
+      logger.error('Error verifying token');
+      logger.error(error);
       return done(error);
     }
     
@@ -36,7 +36,7 @@ const verifyFn: VerifyFunction =
       done(null, new SessionUser(data));
     })
     .catch(error => {
-      console.error('Error fetching User info:', error);
+      logger.error('Error fetching User info:', error);
       done(error);
     });
   };

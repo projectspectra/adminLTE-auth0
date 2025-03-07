@@ -7,6 +7,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { SessionUser } from "./types/SessionUser";
 import expressLayouts from 'express-ejs-layouts';
+import logger from "./utils/logger";
 
 dotenv.config();
 
@@ -36,4 +37,4 @@ app.use((req, res, next) => {
 });
 app.use("/", router);
 
-app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+app.listen(3000, () => logger.log("Server running on http://localhost:3000"));
