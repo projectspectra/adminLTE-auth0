@@ -9,8 +9,14 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <% breadcrumbNames.forEach((breadcrumb, idx) => { %>
+                        <% if (idx + 1 === breadcrumbNames.length) { %>
+                            <li class="breadcrumb-item text-capitalize active"><%= breadcrumb.title %></li>
+                        <% } else { %>
+                            <li class="breadcrumb-item text-capitalize"><a href="<%= breadcrumb.href %>"><%= breadcrumb.title %></a></li>
+                        <% } %>
+                    <% }) %>
                 </ol>
             </div>
         </div>

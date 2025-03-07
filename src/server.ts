@@ -32,6 +32,13 @@ app.use((req, res, next) => {
 
     res.locals.user = req.user;
     res.locals.env = process.env.NODE_ENV;
+
+    const urlParts = req.url.substring(1).split("/");
+    const pages: {title: string, href: string}[] = urlParts.map((page, index) => ({
+        title: page,
+        href: urlParts.slice(0, index + 1).join("/")
+    }));
+    res.locals.breadcrumbNames = pages;
     next();
 });
 
