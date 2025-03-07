@@ -15,13 +15,6 @@
         <!--end::Start Navbar Links-->
         <!--begin::End Navbar Links-->
         <ul class="navbar-nav ms-auto">
-            <!--begin::Navbar Search-->
-            <li class="nav-item">
-                <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-                    <i class="bi bi-search"></i>
-                </a>
-            </li>
-            <!--end::Navbar Search-->
             <!--begin::Fullscreen Toggle-->
             <li class="nav-item">
                 <a class="nav-link" href="#" data-lte-toggle="fullscreen">
@@ -31,28 +24,14 @@
             </li>
             <!--end::Fullscreen Toggle-->
             <!--begin::User Menu Dropdown-->
-            <li class="nav-item dropdown user-menu">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                    <span class="d-none d-md-inline"><%- user.name %></span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                    <!--begin::User Image-->
-                    <li class="user-header text-bg-primary">
-                        <p>
-                            Alexander Pierce - Web Developer
-                            <small>Member since Nov. 2023</small>
-                        </p>
-                    </li>
-                    <!--end::User Image-->
-                    <!--begin::Menu Body-->
-                    <!--end::Menu Body-->
-                    <!--begin::Menu Footer-->
-                    <li class="user-footer">
-                        <a href="/profile" class="btn btn-default btn-flat">Profile</a>
-                        <a href="/logout" class="btn btn-default btn-flat float-end">Sign out</a>
-                    </li>
-                    <!--end::Menu Footer-->
-                </ul>
+            <li class="align-content-center nav-item">
+                <span><%- user.name %></span>
+            </li>
+            <li class="align-content-center nav-item">
+                <div class="d-flex h-50 mx-2 vr"></div>
+            </li>
+            <li class="align-content-center nav-item">
+                <a href="/logout" class="link-danger">Sign out</a>
             </li>
             <!--end::User Menu Dropdown-->
         </ul>
