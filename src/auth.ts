@@ -2,14 +2,12 @@ import { Express, Request, Response } from "express";
 import passport from "passport";
 import { Strategy as OAuth2Strategy, VerifyCallback, VerifyFunction } from "passport-oauth2";
 import session, { SessionOptions } from "express-session";
-import dotenv from "dotenv";
 import jwkToPem from "jwk-to-pem";
 import jwt from "jsonwebtoken";
 import { SessionUser } from "./types/SessionUser";
 import logger from "./utils/logger";
 import FileStore from "session-file-store";
 
-dotenv.config();
 const verifyFn: VerifyFunction =
   (accessToken: string, refreshToken: string, profile: unknown, done: VerifyCallback) => {
     try {
