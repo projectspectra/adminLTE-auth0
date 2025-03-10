@@ -1,7 +1,4 @@
 const log = (message: unknown, level: 'info' | 'warn' | 'table' | 'error', userId?: string) => {
-    if (message instanceof Error) {
-        message = message.message + '\n' + message.stack;
-    }
     if (typeof message !== 'string') {
         console[level](`[${level.toUpperCase()}][${userId || 'SYSTEM'}]`, message);
     } else {

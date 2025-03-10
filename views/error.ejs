@@ -1,0 +1,6 @@
+<h3> Error </h3>
+<p><%= error.message %></p>
+
+<% if(env !== 'production') { %>
+    <code><pre><%= error.stack %></pre></code>
+<% } %>

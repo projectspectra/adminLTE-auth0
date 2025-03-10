@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 import expressLayouts from 'express-ejs-layouts';
 import logger from "./utils/logger";
 import "./types/express";
+import { ApiError } from "./types/express";
 
 const app = express();
 
@@ -42,6 +43,12 @@ morgan.token('userId', function (req: Request) { return req.user?.userId || 'SYS
 app.use(morgan('[DEBUG][:userId] :method :url :status :response-time ms - :res[content-length]'));
 app.use("/", router);
 
-
+app.use((error: ApiError, req: Request, res: express.Response, next: express.NextFunction) => {
+    if(!(error instanceof ApiError)) {
+        error = new ApiError(error);
+    }
+    logger.error(error, req.user?.userId);
+    res.status(error.status).render("error", { error });
+});
 
 app.listen(3000, () => logger.log("Server running on http://localhost:3000"));
