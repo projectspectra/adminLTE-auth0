@@ -26,10 +26,6 @@ app.set("views", path.join(__dirname, "../views"));
 
 app.use(express.static(path.join(__dirname, "../public")));
 app.use((req, res, next) => {
-    if (req.user) {
-        res.locals.userGuid = req.user.sub;
-    }
-
     res.locals.user = req.user;
     res.locals.env = process.env.NODE_ENV;
 
@@ -42,8 +38,8 @@ app.use((req, res, next) => {
     next();
 });
 
-morgan.token('userGuid', function (req: Request) { return req.user?.sub || '-' });
-app.use(morgan(':method :url :status :userGuid :response-time ms - :res[content-length]'));
+morgan.token('userId', function (req: Request) { return req.user?.userId || 'SYSTEM' });
+app.use(morgan('[DEBUG][:userId] :method :url :status :response-time ms - :res[content-length]'));
 app.use("/", router);
 
 

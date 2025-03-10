@@ -43,6 +43,7 @@ const verifyFn: VerifyFunction =
       let sessionUser = new SessionUser(data);
       sessionUser.groups = decodedToken['cognito:groups'];
 
+      logger.log(`User is a member of ${sessionUser.groups.join(', ')} groups.`, data);
       done(null, sessionUser);
     })
     .catch(error => {
@@ -72,12 +73,12 @@ passport.deserializeUser((obj: SessionUser, done) => {
 });
 
 export function authConfig(app: Express) {
-  const Twenty4Hours = 24 * 60 * 60 * 1000; //ms
+  const twenty4Hours = 24 * 60 * 60 * 1000; //ms
   const sessionOptions: SessionOptions = {
     secret: process.env.SESSION_SECRET!,
     cookie: {
       secure: false,
-      maxAge: Twenty4Hours
+      maxAge: twenty4Hours
     },
     resave: false,
     saveUninitialized: true
